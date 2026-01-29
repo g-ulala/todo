@@ -68,14 +68,22 @@ async function addTodo(): Promise<void> {
 
 async function toggleTodo(todo: TodoItem): Promise<void> {
   try {
-    await fetch(`${API_URL}/${todo.id}`, {
+    const response = await fetch(`${API_URL}/${todo.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...todo, isChecked: !todo.isChecked })
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showErrorModal(error.message || 'データが見つかりません');
+      return;
+    }
+
     fetchTodos();
   } catch (error) {
     console.error('Error toggling todo:', error);
+    showErrorModal('通信エラーが発生しました');
   }
 }
 
