@@ -100,3 +100,29 @@ todoInput.addEventListener('keypress', (e) => {
 
 // Initial load
 fetchTodos();
+
+function showErrorModal(message: string): void {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+  modal.innerHTML = `
+    <h2>エラー</h2>
+    <p>${message}</p>
+    <button class="modal-btn">OK</button>
+  `;
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  const closeModal = () => {
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  modal.querySelector('.modal-btn')!.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+}
