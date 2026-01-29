@@ -93,10 +93,18 @@ async function deleteTodo(id: number): Promise<void> {
   }
 
   try {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showErrorModal(error.message || 'データが見つかりません');
+      return;
+    }
+
     fetchTodos();
   } catch (error) {
     console.error('Error deleting todo:', error);
+    showErrorModal('通信エラーが発生しました');
   }
 }
 
