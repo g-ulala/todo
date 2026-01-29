@@ -107,11 +107,20 @@ function showErrorModal(message: string): void {
 
   const modal = document.createElement('div');
   modal.className = 'modal';
-  modal.innerHTML = `
-    <h2>エラー</h2>
-    <p>${message}</p>
-    <button class="modal-btn">OK</button>
-  `;
+
+  const h2 = document.createElement('h2');
+  h2.textContent = 'エラー';
+
+  const p = document.createElement('p');
+  p.textContent = message;
+
+  const button = document.createElement('button');
+  button.className = 'modal-btn';
+  button.textContent = 'OK';
+
+  modal.appendChild(h2);
+  modal.appendChild(p);
+  modal.appendChild(button);
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
