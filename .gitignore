@@ -11,3 +11,8 @@ gha-creds-*.json
 
 # Git worktrees
 .worktrees/
+
+# SQLite database
+data/
+*.db
+*.db-journal
