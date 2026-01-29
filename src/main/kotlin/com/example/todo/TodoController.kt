@@ -1,9 +1,24 @@
 package com.example.todo
 
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
+import org.springframework.http.HttpStatus
+import jakarta.persistence.*
 import java.util.concurrent.atomic.AtomicLong
 
-data class TodoItem(val id: Long, var text: String, var isChecked: Boolean = false)
+@Entity
+@Table(name = "todos")
+data class TodoItem(
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0,
+
+    @Column(nullable = false)
+    var text: String,
+
+    @Column(nullable = false)
+    var isChecked: Boolean = false
+)
 
 @RestController
 @RequestMapping("/api/todos")
