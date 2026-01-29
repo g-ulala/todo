@@ -4,7 +4,6 @@ import org.springframework.web.bind.annotation.*
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.http.HttpStatus
 import jakarta.persistence.*
-import java.util.concurrent.atomic.AtomicLong
 
 @Entity
 @Table(name = "todos")
@@ -22,35 +21,34 @@ data class TodoItem(
 
 @RestController
 @RequestMapping("/api/todos")
-class TodoController {
-    private val todos = mutableListOf<TodoItem>()
-    private val counter = AtomicLong()
+class TodoController(private val repository: TodoRepository) {
 
     @GetMapping
-    fun getTodos(): List<TodoItem> {
-        return todos
-    }
+    fun getTodos(): List<TodoItem> = repository.findAll()
 
     @PostMapping
     fun addTodo(@RequestBody request: Map<String, String>): TodoItem {
         val text = request["text"] ?: ""
-        val todo = TodoItem(counter.incrementAndGet(), text)
-        todos.add(todo)
-        return todo
+        val todo = TodoItem(text = text)
+        return repository.save(todo)
     }
 
     @PutMapping("/{id}")
-    fun updateTodo(@PathVariable id: Long, @RequestBody todoUpdate: TodoItem): TodoItem? {
-        val index = todos.indexOfFirst { it.id == id }
-        if (index != -1) {
-            todos[index] = todoUpdate
-            return todos[index]
+    fun updateTodo(@PathVariable id: Long, @RequestBody todoUpdate: TodoItem): TodoItem {
+        return repository.findById(id).orElseThrow {
+            ResponseStatusException(HttpStatus.NOT_FOUND, "Todo not found")
+        }.also {
+            it.text = todoUpdate.text
+            it.isChecked = todoUpdate.isChecked
+            repository.save(it)
         }
-        return null
     }
 
     @DeleteMapping("/{id}")
     fun deleteTodo(@PathVariable id: Long) {
-        todos.removeIf { it.id == id }
+        if (!repository.existsById(id)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND, "Todo not found")
+        }
+        repository.deleteById(id)
     }
 }
