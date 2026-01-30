@@ -54,28 +54,44 @@ async function addTodo(): Promise<void> {
   if (!text) return;
 
   try {
-    await fetch(API_URL, {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text })
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showErrorModal(error.message || 'Todo の追加に失敗しました');
+      return;
+    }
+
     todoInput.value = '';
     fetchTodos();
   } catch (error) {
     console.error('Error adding todo:', error);
+    showErrorModal('通信エラーが発生しました');
   }
 }
 
 async function toggleTodo(todo: TodoItem): Promise<void> {
   try {
-    await fetch(`${API_URL}/${todo.id}`, {
+    const response = await fetch(`${API_URL}/${todo.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...todo, isChecked: !todo.isChecked })
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showErrorModal(error.message || 'データが見つかりません');
+      return;
+    }
+
     fetchTodos();
   } catch (error) {
     console.error('Error toggling todo:', error);
+    showErrorModal('通信エラーが発生しました');
   }
 }
 
@@ -85,10 +101,18 @@ async function deleteTodo(id: number): Promise<void> {
   }
 
   try {
-    await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+    const response = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showErrorModal(error.message || 'データが見つかりません');
+      return;
+    }
+
     fetchTodos();
   } catch (error) {
     console.error('Error deleting todo:', error);
+    showErrorModal('通信エラーが発生しました');
   }
 }
 
@@ -100,3 +124,38 @@ todoInput.addEventListener('keypress', (e) => {
 
 // Initial load
 fetchTodos();
+
+function showErrorModal(message: string): void {
+  const overlay = document.createElement('div');
+  overlay.className = 'modal-overlay';
+
+  const modal = document.createElement('div');
+  modal.className = 'modal';
+
+  const h2 = document.createElement('h2');
+  h2.textContent = 'エラー';
+
+  const p = document.createElement('p');
+  p.textContent = message;
+
+  const button = document.createElement('button');
+  button.className = 'modal-btn';
+  button.textContent = 'OK';
+
+  modal.appendChild(h2);
+  modal.appendChild(p);
+  modal.appendChild(button);
+
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  const closeModal = () => {
+    overlay.classList.add('fade-out');
+    setTimeout(() => overlay.remove(), 300);
+  };
+
+  modal.querySelector('.modal-btn')!.addEventListener('click', closeModal);
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) closeModal();
+  });
+}

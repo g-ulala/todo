@@ -2,13 +2,19 @@
 
 Kotlin (Spring Boot) と TypeScript (Vite) で構築されたWeb版Todoアプリケーションです。
 
-## 技術スタック
+## ✨ 主な機能
+
+*   **Todoの追加**: テキストを入力して追加ボタンまたはEnterキーで作成
+*   **完了管理**: チェックボックスで完了/未完了を切り替え
+*   **削除**: 削除ボタンでタスクを削除（確認ダイアログあり）
+
+## 🛠️ 技術スタック
 
 *   **バックエンド**: Kotlin, Spring Boot 3
 *   **フロントエンド**: TypeScript, Vite, CSS (Vanilla)
 *   **ビルドツール**: Gradle, npm
 
-## プロジェクト構成
+## 📂 プロジェクト構成
 
 *   `src/main/kotlin/com/example/todo/`
     *   `TodoApplication.kt`: Spring Bootのエントリーポイント
@@ -18,17 +24,9 @@ Kotlin (Spring Boot) と TypeScript (Vite) で構築されたWeb版Todoアプリ
     *   `src/style.css`: スタイル定義
     *   `index.html`: エントリーポイントHTML
     *   `vite.config.js`: Viteビルド設定（プロキシ設定含む）
+*   `delete_old_html.py`: 古いビルド成果物を削除するユーティリティスクリプト
 
-## 開発環境のセットアップ
-
-1.  **Node.jsのインストール**: [公式サイト](https://nodejs.org/)からLTS版をインストールしてください。
-2.  **依存関係のインストール**:
-    ```bash
-    cd frontend
-    npm install
-    ```
-
-## 実行方法
+## 🚀 実行方法
 
 ### 開発モード (ホットリロード有効)
 
@@ -36,13 +34,18 @@ Kotlin (Spring Boot) と TypeScript (Vite) で構築されたWeb版Todoアプリ
 
 1.  **バックエンド起動**:
     IntelliJ IDEAで `TodoApplication.kt` を実行します (ポート 8080)。
-2.  **フロントエンド起動**:
+2.  **依存関係のインストール**:
+    ```bash
+    cd frontend
+    npm install
+    ```
+3.  **フロントエンド起動**:
     ターミナルで以下を実行します。
     ```bash
     cd frontend
     npm run dev
     ```
-3.  ブラウザで **[http://localhost:5173](http://localhost:5173)** にアクセスします。
+4.  ブラウザで **[http://localhost:5173](http://localhost:5173)** にアクセスします。
     *   APIリクエスト (`/api/...`) はViteによって自動的にバックエンド (`localhost:8080`) へ転送されます。
 
 ### 本番ビルドモード (Spring Boot単体実行)
@@ -59,8 +62,20 @@ Kotlin (Spring Boot) と TypeScript (Vite) で構築されたWeb版Todoアプリ
     IntelliJ IDEAで `TodoApplication.kt` を実行します。
 3.  ブラウザで **[http://localhost:8080](http://localhost:8080)** にアクセスします。
 
-## 機能
+## 📝 APIエンドポイント
 
-*   **Todoの追加**: テキストを入力して追加ボタンまたはEnterキーで作成
-*   **完了管理**: チェックボックスで完了/未完了を切り替え
-*   **削除**: 削除ボタンでタスクを削除（確認ダイアログあり）
+| メソッド | パス | 説明 |
+|:---|:---|:---|
+| `GET` | `/api/todos` | すべてのTodo項目を取得します。 |
+| `POST` | `/api/todos` | 新しいTodo項目を追加します。リクエストボディ: `{"text": "..."}` |
+| `PUT` | `/api/todos/{id}` | 既存のTodo項目を更新します（主にチェック状態の変更）。 |
+| `DELETE` | `/api/todos/{id}` | 指定したIDのTodo項目を削除します。 |
+
+## ⚠️ 注意点
+
+*   **データ永続性**: このアプリケーションのTodoデータはサーバーのメモリ上に一時的に保存されるだけです。**サーバーを再起動すると、すべてのデータは失われます。**
+
+## 🔧 ユーティリティ
+
+### `delete_old_html.py`
+本番用のフロントエンドビルド (`npm run build`) を実行する前に、`src/main/resources/static` ディレクトリに残っている可能性のある古い `index.html` を削除するためのスクリプトです。これにより、ビルド間のキャッシュ問題を回避できます。
