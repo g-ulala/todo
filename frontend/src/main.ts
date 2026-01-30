@@ -54,15 +54,23 @@ async function addTodo(): Promise<void> {
   if (!text) return;
 
   try {
-    await fetch(API_URL, {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text })
     });
+
+    if (!response.ok) {
+      const error = await response.json();
+      showErrorModal(error.message || 'Todo の追加に失敗しました');
+      return;
+    }
+
     todoInput.value = '';
     fetchTodos();
   } catch (error) {
     console.error('Error adding todo:', error);
+    showErrorModal('通信エラーが発生しました');
   }
 }
 
